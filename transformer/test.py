@@ -1,5 +1,5 @@
 import torch
-from model import build_transformer
+from model.model import build_transformer
 # Giả sử bạn đã định nghĩa sẵn các class:
 # InputEmbeddings, PositionalEncoding, MultiHeadAttentionBlock,
 # FeedForwardBlock, EncoderBlock, DecoderBlock, Encoder, Decoder, ProjectionLayer, Transformer
@@ -15,6 +15,8 @@ N = 2
 dropout = 0.1
 d_ff = 2048
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(device)
 transformer = build_transformer(
     src_vocab_size=src_vocab_size,
     tgt_vocab_size=tgt_vocab_size,
@@ -25,12 +27,12 @@ transformer = build_transformer(
     h=h,
     dropout=dropout,
     d_ff=d_ff
-)
+).to(device)
 
 # Bước 2: Tạo dữ liệu giả (random token IDs)
 batch_size = 4
-src_input = torch.randint(0, src_vocab_size, (batch_size, src_seq_len))  # shape: (B, S)
-tgt_input = torch.randint(0, tgt_vocab_size, (batch_size, tgt_seq_len))  # shape: (B, T)
+src_input = torch.randint(0, src_vocab_size, (batch_size, src_seq_len)).to("cuda")  # shape: (B, S)
+tgt_input = torch.randint(0, tgt_vocab_size, (batch_size, tgt_seq_len)).to("cuda")  # shape: (B, T)
 
 # Bước 3: Mask (tùy mô hình bạn định nghĩa mask như thế nào)
 # Tạm thời cho None nếu bạn chưa xử lý mask
@@ -41,3 +43,4 @@ tgt_mask = None
 output = transformer(src_input, tgt_input, src_mask, tgt_mask)
 
 print(f"Output shape: {output.shape}")  # kỳ vọng: (batch_size, tgt_seq_len, tgt_vocab_size)
+print(output)
