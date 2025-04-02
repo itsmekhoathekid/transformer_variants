@@ -84,15 +84,9 @@ class Transformer(nn.Module):
     ):
         super().__init__()
 
-        # Embedding + Positional Encoding
-        self.src_embedding = nn.Sequential(
-            InputEmbeddings(d_model, src_vocab_size),
-            PositionalEncoding(d_model, src_seq_len, dropout)
-        )
-        self.tgt_embedding = nn.Sequential(
-            InputEmbeddings(d_model, tgt_vocab_size),
-            PositionalEncoding(d_model, tgt_seq_len, dropout)
-        )
+
+        self.src_embedding = InputEmbeddings(d_model, src_vocab_size)
+        self.tgt_embedding = InputEmbeddings(d_model, tgt_vocab_size)
 
         # Encoder & Decoder Blocks
         encoder_layers = nn.ModuleList([
@@ -133,7 +127,7 @@ class Transformer(nn.Module):
         out = self.decoder(self.tgt_pos(tgt_embedded), memory, src_mask, tgt_mask)
 
         return self.projection_layer(out)
-    
+
     def encode(self, src, src_mask):
         src = self.src_embedding(src)
         src = self.src_pos(src)
